@@ -12,5 +12,3 @@ CREATE TABLE students.students (
     contact_number TEXT NOT NULL,
     address TEXT NOT NULL
 );
-
-
