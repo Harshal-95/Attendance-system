@@ -1,37 +1,28 @@
+<?php
+session_start();
 
-<!DOCTYPE html>
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Database connection code (similar to previous examples)
 
-<html>
-<head>
-    <title>Student Registration</title>
-</head>
-<body>
-    <h2>Student Registration</h2>
-    <form method="POST" action="process_registration.php">
-        <label>Name:</label>
-        <input type="text" name="name" required><br>
+    $enrollment_number = $_POST["enrollment_number"];
+    // Add other login fields here
 
-        <label>Enrollment Number:</label>
-        <input type="text" name="enrollment_number" required><br>
+    // Check if the user exists in the database
+    $loginQuery = $db->prepare("SELECT * FROM students WHERE enrollment_number = :enrollment_number");
+    $loginQuery->bindValue(":enrollment_number", $enrollment_number, SQLITE3_TEXT);
+    $result = $loginQuery->execute();
 
-        <label>Department:</label>
-        <input type="text" name="department" required><br>
+    $row = $result->fetchArray(SQLITE3_ASSOC);
 
-        <label>Year of Diploma:</label>
-        <input type="number" name="year_of_diploma" required><br>
+    if ($row) {
+        // User exists, set a session variable to indicate login
+        $_SESSION["user"] = $row;
+        header("Location: profile.php"); // Redirect to the user's profile page
+    } else {
+        echo "Login failed. User not found.";
+    }
 
-        <label>Date of Birth:</label>
-        <input type="date" name="date_of_birth" required><br>
-
-        <label>Contact Number:</label>
-        <input type="text" name="contact_number" required><br>
-
-        <label>Address:</label>
-        <textarea name="address" required></textarea><br>
-
-        <input type="submit" value="Register">
-     
-
-    </form>
-</body>
-</html>
+    // Close the database connection
+    $db->close();
+}
+?>
